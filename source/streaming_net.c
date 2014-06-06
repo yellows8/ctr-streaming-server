@@ -745,6 +745,15 @@ void network_main()
 
 	net_server.sockfd = 0;
 
+	if(media_mode)
+	{
+		ret = CSND_initialize(NULL);
+		if(ret!=0)
+		{
+			((u32*)0x84000000)[20] = (u32)ret;
+		}
+	}
+
 	ret = svc_createThread(&threadhandle, network_thread, 0, (u32*)&network_threadstack[THREAD_STACKSIZE>>3], 0x3f, ~1);
 
 	network_initialize();
@@ -783,5 +792,7 @@ void network_main()
 		}
 		svc_sleepThread(16666666);
 	}
+
+	if(media_mode)CSND_shutdown();
 }
 
