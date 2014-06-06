@@ -12,17 +12,17 @@ Configuring libvpx building: CROSS=arm-none-eabi- ./configure --target=generic-g
 Configuring libogg building: ./configure --host=arm-none-eabi --prefix=/opt/devkitpro/devkitARM/portlibs/arm/armv6
 
 The audio is 44100Hz pcm_s16le mono-channel, when CODEC is non-zero the data sent to the app must be .ogg.
-When CODEC is non-zero, the video data sent to the app must be VP8 IVF.
+When CODEC is non-zero, the video data sent to the app must be VP8 IVF. The color-format of the video frame is the same as the LCD framebuffer, the width must be 240. For raw video, the color-format is RGB565. The height must be at least 320(sub-screen) or 400(main-screen). For encoded video, larger height values allows more than one LCD framebuffer to be used in each video frame. 320+400 = main-screen image(400 height) + sub-screen image(320 height), 800 = two main-screen images(height 400 for each image), for 3D left and 3D right. 800+320 = same as 800, except this has a 320-height sub-screen image following the main-screen images.
 
-Example terminal commands for streaming to this server:
-Ogg streaming: avconv -i <inputfile> -f s16le -acodec libvorbis -ac 1 -vn -f ogg - | nc <serveraddr> 8334
-Raw audio streaming: avconv -i <inputfile> -f s16le -acodec pcm_s16le -ac 1 - | nc <serveraddr> 8334
-
-The VP8 video framerate from the client should be only ~20-25fps, this is due to single-threaded decoding(higher framerates can't be used due to this not decoding fast enough).
+The VP8 video framerate from the client should be only ~20-25fps(this depends on the video dimensions), this is due to single-threaded decoding(higher framerates can't be used due to this not decoding fast enough).
 
 Playback of the video will stop when the connection closes, regardless of whether playback of the video has finished yet or not. When using netcat for sending the data to the server, a workaround for this is to use the following nc option: "-q -1".
 
 This app handles certain errors by triggering crashes. Note that this includes service initialization failure(such as CSND), like when the app doesn't have access to a required service.
+
+Example terminal commands for streaming to this server:
+Ogg streaming: avconv -i <inputfile> -f s16le -acodec libvorbis -ac 1 -vn -f ogg - | nc <serveraddr> 8334
+Raw audio streaming: avconv -i <inputfile> -f s16le -acodec pcm_s16le -ac 1 - | nc <serveraddr> 8334
 
 This has various bugs, including:
 1) Return-to-menu(which includes power-button handling) does not work, likely due to broken "non-blocking" sockets.
