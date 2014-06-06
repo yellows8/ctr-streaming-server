@@ -5,7 +5,7 @@ make MEDIAMODE=<val> CODEC=<val> HIDREPORT=<val>
 
 MEDIAMODE must be either value 0 for video, or value 1 for audio.
 CODEC must be either value 0 for raw video/audio, or value 1 for encoded video/audio.
-HIDREPORT is optional, when the value is non-zero and MEDIAMODE is 0, the server will send a 0x10c-byte block to the client every >= ~1/60 of a second. The first 0x108-bytes are from hidSharedMem+0, the last word is from here: http://3dbrew.org/wiki/Configuration_Memory#3D_SLIDERSTATE
+HIDREPORT is optional, when the value is non-zero and MEDIAMODE is 0, the server will send a 0x10c-byte block to the client every >= ~1/60 of a second. The first 0x108-bytes are from hidSharedMem+0, the last word is from here: http://3dbrew.org/wiki/Configuration_Memory#3D_SLIDERSTATE The app will only send the HID block while video data is being received.
 
 Besides ctrulib, the following libraries are required: libvpx, libvorbisfile, libvorbis, and libogg.
 Configuring libvpx building: CROSS=arm-none-eabi- ./configure --target=generic-gnu "--extra-cflags=-march=armv6 -mtune=mpcore -mfpu=vfp" --disable-multithread --disable-vp8-encoder --disable-vp9-encoder
@@ -19,6 +19,8 @@ Ogg streaming: avconv -i <inputfile> -f s16le -acodec libvorbis -ac 1 -vn -f ogg
 Raw audio streaming: avconv -i <inputfile> -f s16le -acodec pcm_s16le -ac 1 - | nc <serveraddr> 8334
 
 The VP8 video framerate from the client should be only ~20-25fps, this is due to single-threaded decoding(higher framerates can't be used due to this not decoding fast enough).
+
+Playback of the video will stop when the connection closes, regardless of whether playback of the video has finished yet or not. When using netcat for sending the data to the server, a workaround for this is to use the following nc option: "-q -1".
 
 This app handles certain errors by triggering crashes. Note that this includes service initialization failure(such as CSND), like when the app doesn't have access to a required service.
 
