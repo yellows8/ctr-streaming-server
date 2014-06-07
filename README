@@ -26,8 +26,9 @@ Raw audio streaming: avconv -i <inputfile> -f s16le -acodec pcm_s16le -ac 1 - | 
 
 This has various bugs, including:
 1) Return-to-menu(which includes power-button handling) does not work, likely due to broken "non-blocking" sockets.
-2) When a connection closes, the app will eventually call accept(). This then immediately returns an error(0xd8e07007) from SOC module, the app handles errors from accept() which aren't EWOULDBLOCK by triggering a crash.
+2) Audio playback starting when the initial connection is closed then another connection opened, is broken. The app does not hang/crash(closing the connection + opening the connection again still works), however no audio is played.
 3) Ogg handling is broken, this doesn't work very well compared to raw audio playback. Unlike raw audio playback, the app will quickly hang without crashing, when playing ogg audio.
+4) This app only waits for just one audio chunk(1-second block), then immediately plays that. This results in audio playback briefly stopping while the app waits for the next chunk when playback of the previous chunk already finished.
 
 Credits:
 The yuv2rgb code used by this app is from here: http://wss.co.uk/pinknoise/yuv2rgb/

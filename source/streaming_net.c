@@ -52,7 +52,7 @@ ctrserver net_server;
 
 struct datablock_entry *volatile first_datablockentry = NULL;
 
-#define THREAD_STACKSIZE 0x800
+#define THREAD_STACKSIZE 0x1000
 u64 network_threadstack[THREAD_STACKSIZE>>3];
 
 size_t recv_fread(void *ptr, size_t size, size_t nmemb, void* fd);
