@@ -322,7 +322,7 @@ int process_stream_connection(ctrserver *server, u8 *heap)
 
 			if(!audio_started && media_mode)
 			{
-				CSND_playsound(0x8, 1, 1, 44100, (u32*)&heap[recvpos], NULL, maxsize, 2, 0);
+				CSND_playsound(0x8, CSND_LOOP_ENABLE, CSND_ENCODING_PCM16, 44100, (u32*)&heap[recvpos], NULL, maxsize, 2, 0);
 				audio_started = 1;
 			}*/
 		}
@@ -547,7 +547,7 @@ void network_thread()
 				memcpy(heap, cur_entry->data, cur_entry->datasize);
 				GSPGPU_FlushDataCache(NULL, heap, cur_entry->datasize);
 
-				CSND_playsound(0x8, 0, 1, 44100, (u32*)heap, NULL, cur_entry->datasize, 2, 0);
+				CSND_playsound(0x8, CSND_LOOP_DISABLE, CSND_ENCODING_PCM16, 44100, (u32*)heap, NULL, cur_entry->datasize, 2, 0);
 
 				free(cur_entry->data);
 				cur_entry->data = NULL;
