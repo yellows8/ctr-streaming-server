@@ -16,16 +16,15 @@ When CODEC is non-zero, the video data sent to the app must be VP8 IVF. The colo
 
 The VP8 video framerate from the client should be only ~20-25fps(this depends on the video dimensions), this is due to single-threaded decoding(higher framerates can't be used due to this not decoding fast enough).
 
-Playback of the video will stop when the connection closes, regardless of whether playback of the video has finished yet or not. When using netcat for sending the data to the server, a workaround for this is to use the following nc option: "-q -1".
-
 This app handles certain errors by triggering crashes. Note that this includes service initialization failure(such as CSND), like when the app doesn't have access to a required service.
 
 Example terminal commands for streaming to this server:
 Ogg streaming: avconv -i <inputfile> -f s16le -acodec libvorbis -ac 1 -vn -f ogg - | nc <serveraddr> 8334
 Raw audio streaming: avconv -i <inputfile> -f s16le -acodec pcm_s16le -ac 1 - | nc <serveraddr> 8334
+VP8 IVF, for just sub-screen: avconv -i <video input path> -s 320x240 -vf transpose=1 -r 30 -f ivf - | nc <serveraddr> 8334
 
 This has various bugs, including:
-1) Return-to-menu(which includes power-button handling) does not work, likely due to broken "non-blocking" sockets.
+1) Return-to-homemenu(which includes power-button handling) does not work, returning to hbmenu is broken too.
 2) Audio playback starting when the initial connection is closed then another connection opened, is broken. The app does not hang/crash(closing the connection + opening the connection again still works), however no audio is played.
 3) Ogg handling is broken, this doesn't work very well compared to raw audio playback. Unlike raw audio playback, the app will quickly hang without crashing, when playing ogg audio.
 4) This app only waits for just one audio chunk(1-second block), then immediately plays that. This results in audio playback briefly stopping while the app waits for the next chunk when playback of the previous chunk already finished.
